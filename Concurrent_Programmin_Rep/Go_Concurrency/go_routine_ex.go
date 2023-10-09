@@ -2,7 +2,7 @@
 *
 *	@author Elia Renzoni
 *	@date 09/10/2023
-*	@brief Go routine first example
+*	@brief Go routine first example, with errors
 *
  */
 package main
