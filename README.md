@@ -1,2 +1,2 @@
 # Operating_System
-Repository of the course of operating systems
+Repository of Concurrent Programming Problems. Using C, Java and Go
