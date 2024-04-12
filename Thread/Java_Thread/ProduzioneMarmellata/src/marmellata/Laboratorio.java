@@ -24,11 +24,7 @@ public class Laboratorio {
 		try {
 			this.mutex.lock();
 			System.out.println("Il Thread " + t.getName() + " controlla se ci sono ingredienti");
-			if (this.numeroFrutta >= 8 && this.numeroZucchero >= 200) {
-				System.out.println("Il Thread " + t.getName() + " ha ottenuto gli ingredienti richiesti !");
-				this.numeroFrutta -= 8;
-				this.numeroZucchero -= 200;
-			} else {
+			if (!(this.numeroFrutta >= 8 && this.numeroZucchero >= 200)) {
 				try {
 					System.out.println("Il Thread " + t.getName() + " si sospende poichè non ci sono ingredienti");
 					t.sospendimi();
@@ -36,6 +32,9 @@ public class Laboratorio {
 					e.printStackTrace();
 				}
 			}
+			System.out.println("Il Thread " + t.getName() + " ha ottenuto gli ingredienti richiesti !");
+			this.numeroFrutta -= 8;
+			this.numeroZucchero -= 200;
 		} finally {
 			this.mutex.unlock();
 		}
