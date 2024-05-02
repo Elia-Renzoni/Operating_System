@@ -5,7 +5,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Bagno {
-	private int numeroPosti;
+	private int contatore;
 	private int sesso;	// 0 = unisex, 1 = uomo, 2 = donna
 	private ReentrantLock mutex;
 	private Semaphore richieste;
@@ -24,34 +24,31 @@ public class Bagno {
 		
 		this.mutex.lock();
 		try {
-			this.numeroPosti++;
-			if (this.numeroPosti == 1) {
+			if (this.sesso == 0) {
+				this.sesso = t instanceof Uomo? 1: 2;
+			}
+			
+			int mySesso = t instanceof Uomo? 1 : 2;
+			while (this.sesso != mySesso && this.sesso != 0) {
 				if (t instanceof Uomo) {
-					System.out.println("Il Thread " + t.getName() + " ha cambiato sesso in uomo!");
-					this.sesso = 1;
+					try {
+						this.uomo.await();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				} else if (t instanceof Donna) {
-					System.out.println("Il Thread " + t.getName() + " ha cambiato sesso in donna !!");
-					this.sesso = 2;
+					try {
+						this.donna.await();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			
-			if (this.sesso == 1 && t instanceof Donna) {
-				try {
-					System.out.println("Il Thread " + t.getName() + " si sospende poichè donna invece che uomo !");
-					this.donna.await();
-					this.numeroPosti--;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			} else if (this.sesso == 2 && t instanceof Uomo) {
-				try {
-					System.out.println("Il Thread " + t.getName() + " si sospende poichè uomo invece che donna !");
-					this.uomo.await();
-					this.numeroPosti--;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			if (this.sesso == 0) {
+				this.sesso = t instanceof Uomo? 1 : 2;
 			}
+			
 		} finally {
 			this.mutex.unlock();
 		}
@@ -66,17 +63,15 @@ public class Bagno {
 	public void notificaUscita(Thread t) {
 		this.mutex.lock();
 		try {
-			if (this.numeroPosti >= 3) {
+			this.contatore++;
+			if (this.contatore >= 3) {
+				this.sesso = 0;
 				if (t instanceof Uomo) {
-					this.sesso = 2;
-					System.out.println("Il Thread " + t.getName() + " ha cambiato sesso in donna !");
 					this.donna.signalAll();
 				} else if (t instanceof Donna) {
-					this.sesso = 1;
-					System.out.println("Il Thread " + t.getName() + " ha cambiato sesso in uomo !");
 					this.uomo.signalAll();
 				}
-				this.numeroPosti = 0;
+				this.contatore = 0;
 			}
 		} finally {
 			this.mutex.unlock();

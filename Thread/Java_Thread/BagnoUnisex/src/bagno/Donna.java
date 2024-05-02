@@ -5,11 +5,17 @@ import java.util.Random;
 public class Donna extends Thread {
 	private Bagno bagno;
 	private Random rnd;
+	private int sesso;
 	
 	public Donna(final Bagno bagno, final int i) {
 		super("Donna " + i);
 		this.bagno = bagno;
 		this.rnd = new Random();
+		this.sesso = 2;
+	}
+	
+	public int getSesso() {
+		return this.sesso;
 	}
 	
 	public void run() {
